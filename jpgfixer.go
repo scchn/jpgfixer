@@ -5,52 +5,52 @@ import (
 )
 
 const (
-	nhdr = 4
-	soi  = 0xd8
-	dht  = 0xc4
-	sos  = 0xda
+	nmk = 4
+	soi = 0xd8
+	dht = 0xc4
+	sos = 0xda
 )
 
 // Fix fixes a mjpeg frame by inserting the huffman table
-func Fix(imgData []byte) ([]byte, error) {
+func Fix(src []byte) ([]byte, error) {
 	var (
-		dstData []byte
-		data    = append(imgData[:0], imgData...)
-		hasHdr  bool
-		hdr     = make([]byte, nhdr)
+		dst  []byte
+		ht   bool
+		data = append(src[:0], src...)
+		mk   = make([]byte, nmk)
 	)
 
-	memcpy(hdr, &data, 2)
-	if hdr[0] != 0xff || hdr[1] != soi {
+	memcpy(mk, &data, 2)
+	if mk[0] != 0xff || mk[1] != soi {
 		return nil, errors.New("missing SOI")
 	}
-	dstData = append(dstData, hdr[:2]...)
+	dst = append(dst, mk[:2]...)
 
-	for !hasHdr {
-		memcpy(hdr, &data, nhdr)
-		if hdr[0] != 0xff {
+	for !ht {
+		memcpy(mk, &data, nmk)
+		if mk[0] != 0xff {
 			return nil, errors.New("missing marker")
 		}
-		if hdr[1] == dht {
-			hasHdr = true
-		} else if hdr[1] == sos {
+		if mk[1] == dht {
+			ht = true
+		} else if mk[1] == sos {
 			break
 		}
-		size := (int(hdr[2]) << 8) | int(hdr[3])
-		dstData = append(dstData, hdr...)
+		size := (int(mk[2]) << 8) | int(mk[3])
+		dst = append(dst, mk...)
 		l := size - 2
 		tmp := make([]byte, l)
 		memcpy(tmp, &data, l)
-		dstData = append(dstData, tmp...)
+		dst = append(dst, tmp...)
 	}
 
-	if !hasHdr {
-		dstData = append(dstData, []byte(table)...)
-		dstData = append(dstData, hdr...)
+	if !ht {
+		dst = append(dst, []byte(table)...)
+		dst = append(dst, mk...)
 	}
 
-	dstData = append(dstData, data...)
-	return dstData, nil
+	dst = append(dst, data...)
+	return dst, nil
 }
 
 func memcpy(dst []byte, src *[]byte, n int) int {
