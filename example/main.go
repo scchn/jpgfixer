@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/sccxx/jpgfixer/"
+	"github.com/sccxx/jpgfixer"
 )
 
 var (
