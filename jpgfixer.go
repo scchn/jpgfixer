@@ -16,7 +16,7 @@ func Fix(src []byte) ([]byte, error) {
 	var (
 		dst  []byte
 		ht   bool
-		data = append(src[:0], src...)
+		data = append([]byte{}, src...)
 		mk   = make([]byte, nmk)
 	)
 

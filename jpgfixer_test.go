@@ -7,21 +7,19 @@ import (
 
 func Test_Memcpy(t *testing.T) {
 	var (
-		rl  = 4
-		o   = []byte("12345678")
-		dst = make([]byte, rl)
-		src = []byte("12345678")
+		offset = 0
+		src    = []byte("12345678")
+		o      = append([]byte{}, src...)
+		dst    = make([]byte, 4)
 	)
 	for len(src) != 0 {
-		memcpy(dst, &src, rl)
-		read := o[:rl]
-		if bytes.Compare(dst, read) != 0 {
-			t.Fatalf("Expect %s got %s", read, dst)
+		read := memcpy(dst, &src, len(dst))
+		if bytes.Compare(dst, o[offset:offset+read]) != 0 {
+			t.Fatalf("dst expect %s, got %s", o[offset:offset+read], dst)
 		}
-		rest := o[rl:]
-		if bytes.Compare(src, rest) != 0 {
-			t.Fatalf("Expect %s got %s", rest, src)
+		offset += read
+		if bytes.Compare(src, o[offset:]) != 0 {
+			t.Fatalf("src expect %s, got %s", o[offset:], src)
 		}
-		o = rest
 	}
 }
