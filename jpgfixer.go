@@ -27,6 +27,7 @@ func Fix(src []byte) ([]byte, error) {
 	dst = append(dst, mk[:2]...)
 
 	for !ht {
+		// next maker and segment size
 		memcpy(mk, &data, nmk)
 		if mk[0] != 0xff {
 			return nil, errors.New("missing marker")
@@ -36,21 +37,25 @@ func Fix(src []byte) ([]byte, error) {
 		} else if mk[1] == sos {
 			break
 		}
-		size := (int(mk[2]) << 8) | int(mk[3])
+		// insert segment
 		dst = append(dst, mk...)
-		l := size - 2
-		tmp := make([]byte, l)
-		memcpy(tmp, &data, l)
-		dst = append(dst, tmp...)
+		size := segLen(mk)
+		seg := make([]byte, size)
+		memcpy(seg, &data, size)
+		dst = append(dst, seg...)
 	}
 
+	// DHT not found
 	if !ht {
-		dst = append(dst, []byte(table)...)
-		dst = append(dst, mk...)
+		dst = append(dst, append(table, mk...)...)
 	}
-
+	// and append the rest of the image
 	dst = append(dst, data...)
 	return dst, nil
+}
+
+func segLen(mk []byte) int {
+	return mk[2] << 8) | mk[3] - 2
 }
 
 func memcpy(dst []byte, src *[]byte, n int) int {

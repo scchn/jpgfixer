@@ -1,1 +1,5 @@
 .DS_Store
+example/go.mod
+example/go.sum
+example/example
+output.jpg
