@@ -55,7 +55,9 @@ func Fix(src []byte) ([]byte, error) {
 }
 
 func segLen(mk []byte) int {
-	return mk[2] << 8) | mk[3] - 2
+	hi := int(mk[2])
+	lo := int(mk[3])
+	return hi<<8 | lo - 2
 }
 
 func memcpy(dst []byte, src *[]byte, n int) int {
